@@ -188,4 +188,4 @@ function reset() {
     gameState = GameState[0];
 }
 
-client.login(config.token);
+client.login(process.env.BOT_TOKEN);
