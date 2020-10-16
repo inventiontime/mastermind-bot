@@ -4,6 +4,9 @@
     "description": "",
     "main": "bot.js",
     "author": "inventiontime",
+    "scripts": {
+        "start": "node bot.js"
+    },
     "dependencies": {
         "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
         "discord.js": "^12.3.1",
