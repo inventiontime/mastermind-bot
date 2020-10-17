@@ -88,6 +88,7 @@ client.on('message', message => {
 
                 if(player1 == player2) {
                     message.channel.send("You can't play with yourself!");
+                    gameState = GameState[0];
                 } else {
                     gameState = GameState[1];
                     gameChannel = message.channel;
