@@ -15,7 +15,15 @@ var gameChannel;
 var gameState = GameState[0];
 
 client.once('ready', () => {
-	console.log('Ready!');
+    console.log('Ready!');
+    
+    client.user.setPresence({
+        status: "online",
+        game: {
+            name: "!help",
+            type: "LISTENING",
+        }
+    });
 });
 
 client.on('message', message => {
@@ -52,6 +60,23 @@ client.on('message', message => {
     const args = split.slice(1);
     
     switch(command) {
+        case "help":
+            message.channel.send(
+                "> **HOW TO PLAY**\n" +
+                "1. Each person chooses a **secret 3 digit number**\n" +
+                "2. The objective of the game is to guess the other persons number\n" +
+                "3. For each guess, you are told number of cows and bulls you scored\n" +
+                "4. First person to **guess the other's number** wins\n\n" +
+                
+                "**COWS AND BULLS**\n" +
+                "Let's say the number is 123 and your guess is 134\n" +
+                "As the digit **1** is in both numbers and at the same position, it is a **bull**\n" +
+                "As the digit **3** is in both numbers but is at different positions, it is a **cow**\n" +
+                "So you get **1 cow, 1 bull**\n\n" +
+                
+                "If you get 0 cows and 0 bulls, the response is **shit**");
+            break;
+
         case "play":
             if(args.length == 1 && (gameState == GameState[0] || gameState == GameState[1])) {
                 player1 = message.author;
