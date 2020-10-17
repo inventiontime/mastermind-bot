@@ -68,7 +68,7 @@ client.on('message', message => {
                 "3. For each guess, you are told number of cows and bulls you scored\n" +
                 "4. First person to **guess the other's number** wins\n\n" +
                 
-                "**COWS AND BULLS**\n" +
+                "> **COWS AND BULLS**\n" +
                 "Let's say the number is 123 and your guess is 134\n" +
                 "As the digit **1** is in both numbers and at the same position, it is a **bull**\n" +
                 "As the digit **3** is in both numbers but is at different positions, it is a **cow**\n" +
