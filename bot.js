@@ -155,8 +155,10 @@ client.on('message', message => {
 
         case "exit":
         case "e":
-            if((message.author == player1 || message.author == player2) && gameState != GameState[0] && gameState != GameState[1])
+            if((message.author == player1 || message.author == player2) && gameState != GameState[0] && gameState != GameState[1] && message.channel == gameChannel) {
                 reset();
+                gameChannel.send("Match has ended");
+            }
             break;
     }
 });
