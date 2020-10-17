@@ -74,7 +74,9 @@ client.on('message', message => {
                 "As the digit **3** is in both numbers but is at different positions, it is a **cow**\n" +
                 "So you get **1 cow, 1 bull**\n\n" +
                 
-                "If you get 0 cows and 0 bulls, the response is **shit**");
+                "If you get 0 cows and 0 bulls, the response is **shit**\n\n" +
+                
+                "To start playing, type !play @user");
             break;
 
         case "play":
