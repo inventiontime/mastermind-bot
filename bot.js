@@ -152,6 +152,11 @@ client.on('message', message => {
                 }
             }
             break;
+
+        case "exit":
+        case "e":
+            if((message.author == player1 || message.author == player2) && gameState != GameState[0] && gameState != GameState[1])
+            break;
     }
 });
 
