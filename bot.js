@@ -60,7 +60,8 @@ client.on('message', message => {
     const args = split.slice(1);
     
     switch(command) {
-        case "help" || "h":
+        case "help":
+        case "h":
             message.channel.send(
                 "> **HOW TO PLAY**\n" +
                 "1. Each person chooses a **secret 3 digit number**\n" +
@@ -79,7 +80,8 @@ client.on('message', message => {
                 "To start playing, type !play @user");
             break;
 
-        case "play" || "p":
+        case "play":
+        case "p":
             if(args.length == 1 && (gameState == GameState[0] || gameState == GameState[1])) {
                 player1 = message.author;
                 player2 = getUserFromMention(args[0]);
@@ -94,7 +96,8 @@ client.on('message', message => {
             }
             break;
 
-        case "ready" || "r":
+        case "ready":
+        case "r":
             if(gameState == GameState[1] && player2 == message.author && message.channel == gameChannel) {
                 gameState = GameState[2];
                 message.channel.send("Please DM your numbers to me <@" + player1.id + "> and <@" + player2.id + ">");
@@ -104,7 +107,8 @@ client.on('message', message => {
             }
             break;
 
-        case "guess" || "g":
+        case "guess":
+        case "g":
             if(gameState == GameState[3] && message.channel == gameChannel && args.length == 1) {
                 if((player1turn && message.author == player1) || (!player1turn && message.author == player2)) {
                     if(verifyMessage(args[0])){
