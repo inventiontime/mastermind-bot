@@ -86,7 +86,7 @@ client.on('message', message => {
                 "**To start playing, type !play @user**");
 
             if(chIdx == -1) {
-                message.channel.send("You cannot play in this channel. To add this channel, type !addchannel (or !ac)");
+                message.channel.send("```You cannot play in this channel. To add this channel, type !addchannel (or !ac)```");
             }
             break;
 
