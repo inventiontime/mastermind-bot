@@ -2,17 +2,17 @@ const Discord = require('discord.js');
 const config = require('./config.json');
 const client = new Discord.Client();
 
-var player1;
-var player2;
-var number1;
-var number2;
-var player1turn;
-var interval;
-var number1set = false;
-var number2set = false;
+var player1 = [];
+var player2 = [];
+var number1 = [];
+var number2 = [];
+var player1turn = [];
+var interval = [];
+var number1set = [];
+var number2set = [];
+var gameChannel = [];
+var gameState = [];
 const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining"];
-var gameChannel;
-var gameState = GameState[0];
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -28,24 +28,28 @@ client.once('ready', () => {
 
 client.on('message', message => {
     if(message.channel.type == "dm") {
-        if(gameState == GameState[2]) {
-            if(message.author == player1) {
-                if(verifyMessage(message.content) && !number1set) {
-                    number1 = message.content;
-                    number1set = true;
-                    message.channel.send("Your number is " + number1);
-                } else {
-                    message.channel.send("Number should be 3 digits long, and have no zeroes or repetition")
+        for(var i = 0; i < gameChannel.length; i++) {
+            if(gameState[i] == GameState[2]) {
+                if(message.author == player1[i]) {
+                    if(verifyMessage(message.content) && !number1set[i]) {
+                        number1[i] = message.content;
+                        number1set[i] = true;
+                        message.channel.send("Your number is " + number1[i]);
+                        return;
+                    } else {
+                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                    }
                 }
-            }
 
-            if(message.author == player2) {
-                if(verifyMessage(message.content) && !number2set) {
-                    number2 = message.content;
-                    number2set = true;
-                    message.channel.send("Your number is " + number2);
-                } else {
-                    message.channel.send("Number should be 3 digits long, and have no zeroes or repetition")
+                if(message.author == player2[i]) {
+                    if(verifyMessage(message.content) && !number2set[i]) {
+                        number2[i] = message.content;
+                        number2set[i] = true;
+                        message.channel.send("Your number is " + number2[i]);
+                        return;
+                    } else {
+                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                    }
                 }
             }
         }
@@ -58,7 +62,9 @@ client.on('message', message => {
 	const split = withoutPrefix.split(/ +/);
 	const command = split[0];
     const args = split.slice(1);
-    
+
+    const chIdx = gameChannel.indexOf(message.channel);
+
     switch(command) {
         case "help":
         case "h":
@@ -77,89 +83,111 @@ client.on('message', message => {
                 
                 "If you get 0 cows and 0 bulls, the response is **shit**\n\n" +
                 
-                "To start playing, type !play @user");
+                "**To start playing, type !play @user**");
+
+            if(chIdx == -1) {
+                message.channel.send("```You cannot play in this channel. To add this channel, type !addchannel (or !ac)```");
+            }
             break;
 
-        case "play":
-        case "p":
-            if(args.length == 1 && (gameState == GameState[0] || gameState == GameState[1])) {
-                player1 = message.author;
-                player2 = getUserFromMention(args[0]);
-
-                if(player1 == player2) {
-                    message.channel.send("You can't play with yourself!");
-                    gameState = GameState[0];
+        case "addchannel":
+        case "ac":
+            if(chIdx == -1) {
+                if(message.member.hasPermission('ADMINISTRATOR')) {
+                    gameChannel.push(message.channel);
+                    add(chIdx);
+                    message.channel.send("This channel has been added");
                 } else {
-                    gameState = GameState[1];
-                    gameChannel = message.channel;
-                    message.channel.send(args[0] + " please type !ready to start game");
+                    message.channel.send("This is an administrator command.")
                 }
+            } else {
+                message.channel.send("This channel has already been added");
             }
             break;
+    }
+    
+    if(chIdx != -1) {
+        switch(command) {
+            case "play":
+            case "p":
+                if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                    player1[chIdx] = message.author;
+                    player2[chIdx] = getUserFromMention(args[0]);
 
-        case "ready":
-        case "r":
-            if(gameState == GameState[1] && player2 == message.author && message.channel == gameChannel) {
-                gameState = GameState[2];
-                message.channel.send("Please DM your numbers to me <@" + player1.id + "> and <@" + player2.id + ">");
-                player1.send("Send a 3 digit number.");
-                player2.send("Send a 3 digit number.");
-                interval = setInterval(checkForNumbers, 3000);
-            }
-            break;
+                    if(player1[chIdx] == player2[chIdx]) {
+                        message.channel.send("You can't play with yourself!");
+                        gameState[chIdx] = GameState[0];
+                    } else {
+                        gameState[chIdx] = GameState[1];
+                        message.channel.send(args[0] + " please type !ready to start game");
+                    }
+                }
+                break;
 
-        case "guess":
-        case "g":
-            if(gameState == GameState[3] && message.channel == gameChannel && args.length == 1) {
-                if((player1turn && message.author == player1) || (!player1turn && message.author == player2)) {
-                    if(verifyMessage(args[0])){
-                        if((player1turn && args[0] == number2) || (!player1turn && args[0] == number1)) {
-                            if(player1turn) {
-                                gameState = GameState[4];
-                                player1turn = !player1turn;
-                                gameChannel.send("3 " + config.redsname + "!!!")
-                                gameChannel.send("<@" + player2.id + "> , you have a chance to tie! Its your turn.");
+            case "ready":
+            case "r":
+                if(gameState[chIdx] == GameState[1] && player2[chIdx] == message.author && message.channel == gameChannel[chIdx]) {
+                    gameState[chIdx] = GameState[2];
+                    message.channel.send("Please DM your numbers to me <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">");
+                    player1[chIdx].send("Send a 3 digit number.");
+                    player2[chIdx].send("Send a 3 digit number.");
+                    interval[chIdx] = setInterval(function() { checkForNumbers(chIdx); }, 3000);
+                }
+                break;
+
+            case "guess":
+            case "g":
+                if(gameState[chIdx] == GameState[3] && message.channel == gameChannel[chIdx] && args.length == 1) {
+                    if((player1turn[chIdx] && message.author == player1[chIdx]) || (!player1turn[chIdx] && message.author == player2[chIdx])) {
+                        if(verifyMessage(args[0])){
+                            if((player1turn[chIdx] && args[0] == number2[chIdx]) || (!player1turn[chIdx] && args[0] == number1[chIdx])) {
+                                if(player1turn[chIdx]) {
+                                    gameState[chIdx] = GameState[4];
+                                    player1turn[chIdx] = !player1turn[chIdx];
+                                    gameChannel[chIdx].send("3 " + config.redsname + "!!!")
+                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
+                                } else {
+                                    reset(chIdx);
+                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won lol :partying_face:");
+                                } 
                             } else {
-                                reset();
-                                gameChannel.send("<@" + player2.id + "> win lol :partying_face:");
-                            } 
+                                if(player1turn[chIdx]) message.channel.send(checkGuess(args[0], number2[chIdx]))
+                                else message.channel.send(checkGuess(args[0], number1[chIdx]))
+
+                                player1turn[chIdx] = !player1turn[chIdx];
+
+                                if(player1turn[chIdx]) gameChannel[chIdx].send("Its <@" + player1[chIdx].id + "> 's turn");
+                                else gameChannel[chIdx].send("Its <@" + player2[chIdx].id + "> 's turn");
+                            }
                         } else {
-                            if(player1turn) message.channel.send(checkGuess(args[0], number2))
-                            else message.channel.send(checkGuess(args[0], number1))
-
-                            player1turn = !player1turn;
-
-                            if(player1turn) gameChannel.send("Its <@" + player1.id + "> 's turn");
-                            else gameChannel.send("Its <@" + player2.id + "> 's turn");
+                            message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
                         }
-                    } else {
-                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                    }
+                } else if(gameState[chIdx] == GameState[4] && message.channel == gameChannel[chIdx] && args.length == 1) {
+                    if(message.author == player2[chIdx]) {
+                        if(verifyMessage(args[0])){
+                            if(args[0] == number1[chIdx]) {
+                                reset(chIdx);
+                                gameChannel[chIdx].send("Its a tie! :partying_face:");
+                            } else {
+                                reset(chIdx);
+                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won lol :partying_face:");
+                            }
+                        } else {
+                            message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                        }
                     }
                 }
-            } else if(gameState == GameState[4] && message.channel == gameChannel && args.length == 1) {
-                if(message.author == player2) {
-                    if(verifyMessage(args[0])){
-                        if(args[0] == number1) {
-                            reset();
-                            gameChannel.send("Its a tie! :partying_face:");
-                        } else {
-                            reset();
-                            gameChannel.send("<@" + player1.id + "> win lol :partying_face:");
-                        }
-                    } else {
-                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
-                    }
-                }
-            }
-            break;
+                break;
 
-        case "exit":
-        case "e":
-            if((message.author == player1 || message.author == player2) && gameState != GameState[0] && gameState != GameState[1] && message.channel == gameChannel) {
-                reset();
-                gameChannel.send("Match has ended");
-            }
-            break;
+            case "exit":
+            case "e":
+                if((message.author == player1[chIdx] || message.author == player2[chIdx]) && gameState[chIdx] != GameState[0] && gameState[chIdx] != GameState[1] && message.channel == gameChannel[chIdx]) {
+                    reset(chIdx);
+                    gameChannel[chIdx].send("Match has ended");
+                }
+                break;
+        }
     }
 });
 
@@ -177,13 +205,14 @@ function getUserFromMention(mention) {
 	}
 }
 
-function checkForNumbers() {
-    if(number1set && number2set) {
-        gameState = GameState[3];
-        gameChannel.send("You can start guessing using !guess [number]");
-        gameChannel.send("Its <@" + player1.id + "> 's turn");
-        player1turn = true;
-        clearInterval(interval);
+function checkForNumbers(chIdx) {
+    if(number1set[chIdx] && number2set[chIdx]) {
+        gameState[chIdx] = GameState[3];
+        gameChannel[chIdx].send("You can start guessing using !guess [number]");
+        gameChannel[chIdx].send("Its <@" + player1[chIdx].id + "> 's turn");
+        player1turn[chIdx] = true;
+        clearInterval(interval[chIdx]);
+        interval[chIdx] = null;
     }
 }
 
@@ -222,10 +251,19 @@ function checkGuess(guess, number) {
         return reds.toString() + " " + config.redsname + ", " + whites.toString() + " " + config.whitesname;
 }
 
-function reset() {
-    number1set = false;
-    number2set = false;
-    gameState = GameState[0];
+function reset(chIdx) {
+    number1set[chIdx] = false;
+    number2set[chIdx] = false;
+    gameState[chIdx] = GameState[0];
+}
+
+function add(chIdx) {
+    number1.push(0);
+    number2.push(0);
+    player1turn.push(true);
+    number1set.push(false);
+    number2set.push(false);
+    gameState.push(GameState[0]);
 }
 
 client.login(process.env.BOT_TOKEN);
