@@ -65,7 +65,7 @@ client.on('message', message => {
 	const command = split[0];
     const args = split.slice(1);
 
-    const chIdx = gameChannel.indexOf(message.channel);
+    var chIdx = gameChannel.indexOf(message.channel);
 
     if(chIdx == -1) {
         gameChannel.push(message.channel);
