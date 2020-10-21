@@ -14,6 +14,8 @@ var gameChannel = [];
 var gameState = [];
 const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining"];
 
+var games = 0;
+
 client.once('ready', () => {
     console.log('Ready!');
     
@@ -90,7 +92,9 @@ client.on('message', message => {
                 
                 "If you get 0 cows and 0 bulls, the response is **shit**\n\n" +
                 
-                "**To start playing, type !play @user**");
+                "**To start playing, type !play @user**\n\n" +
+                
+                "This bot is made by @inventiontime");
                 
             break;
     }
@@ -117,6 +121,8 @@ client.on('message', message => {
             case "r":
                 if(gameState[chIdx] == GameState[1] && player2[chIdx] == message.author && message.channel == gameChannel[chIdx]) {
                     gameState[chIdx] = GameState[2];
+                    games++;
+                    console.log(games);
                     message.channel.send("Please DM your numbers to me <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">");
                     player1[chIdx].send("Send a 3 digit number.");
                     player2[chIdx].send("Send a 3 digit number.");
