@@ -65,6 +65,13 @@ client.on('message', message => {
 
     const chIdx = gameChannel.indexOf(message.channel);
 
+    if(chIdx == -1) {
+        gameChannel.push(message.channel);
+        add();
+        chIdx = gameChannel.indexOf(message.channel);
+        message.channel.send("This channel has been added");
+    }
+
     switch(command) {
         case "help":
         case "h":
@@ -84,25 +91,7 @@ client.on('message', message => {
                 "If you get 0 cows and 0 bulls, the response is **shit**\n\n" +
                 
                 "**To start playing, type !play @user**");
-
-            if(chIdx == -1) {
-                message.channel.send("```You cannot play in this channel. To add this channel, type !addchannel (or !ac)```");
-            }
-            break;
-
-        case "addchannel":
-        case "ac":
-            if(chIdx == -1) {
-                if(message.member.hasPermission('ADMINISTRATOR')) {
-                    gameChannel.push(message.channel);
-                    add(chIdx);
-                    message.channel.send("This channel has been added");
-                } else {
-                    message.channel.send("This is an administrator command.")
-                }
-            } else {
-                message.channel.send("This channel has already been added");
-            }
+                
             break;
     }
     
@@ -257,7 +246,7 @@ function reset(chIdx) {
     gameState[chIdx] = GameState[0];
 }
 
-function add(chIdx) {
+function add() {
     number1.push(0);
     number2.push(0);
     player1turn.push(true);
