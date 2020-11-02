@@ -139,11 +139,11 @@ client.on('message', message => {
                                 if(player1turn[chIdx]) {
                                     gameState[chIdx] = GameState[4];
                                     player1turn[chIdx] = !player1turn[chIdx];
-                                    gameChannel[chIdx].send("3 " + config.redsname + "!!!")
+                                    gameChannel[chIdx].send("Correct number!!!")
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
                                 } else {
                                     reset(chIdx);
-                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won lol :partying_face:");
+                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won! :partying_face: ID: " + floor(Math.random * 100000));
                                 } 
                             } else {
                                 if(player1turn[chIdx]) message.channel.send(checkGuess(args[0], number2[chIdx]))
@@ -163,10 +163,10 @@ client.on('message', message => {
                         if(verifyMessage(args[0])){
                             if(args[0] == number1[chIdx]) {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("Its a tie! :partying_face:");
+                                gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">! :partying_face: ID: " + floor(Math.random * 100000));
                             } else {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won lol :partying_face:");
+                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won! :partying_face: ID: " + floor(Math.random * 100000));
                             }
                         } else {
                             message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
