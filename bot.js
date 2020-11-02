@@ -143,7 +143,7 @@ client.on('message', message => {
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
                                 } else {
                                     reset(chIdx);
-                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won! :partying_face: ID: " + floor(Math.random * 100000).toString());
+                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random * 100000).toString());
                                 } 
                             } else {
                                 if(player1turn[chIdx]) message.channel.send(checkGuess(args[0], number2[chIdx]))
@@ -163,10 +163,10 @@ client.on('message', message => {
                         if(verifyMessage(args[0])){
                             if(args[0] == number1[chIdx]) {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">! :partying_face: ID: " + floor(Math.random * 100000).toString());
+                                gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">! :partying_face: ID: " + Math.floor(Math.random * 100000).toString());
                             } else {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won! :partying_face: ID: " + floor(Math.random * 100000).toString());
+                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random * 100000).toString());
                             }
                         } else {
                             message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
