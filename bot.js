@@ -71,7 +71,7 @@ client.on('message', message => {
         gameChannel.push(message.channel);
         add();
         chIdx = gameChannel.indexOf(message.channel);
-        message.channel.send("This channel has been added");
+        //message.channel.send("This channel has been added");
     }
 
     switch(command) {
