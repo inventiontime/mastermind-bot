@@ -12,6 +12,7 @@ var number1set = [];
 var number2set = [];
 var gameChannel = [];
 var gameState = [];
+var numberLength = [];
 const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining"];
 
 var games = 0;
@@ -39,7 +40,7 @@ client.on('message', message => {
                         message.channel.send("Your number is " + number1[i]);
                         return;
                     } else {
-                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                        message.channel.send("Number should be " + numberLength[i] + " digits long, and have no zeroes or repetition");
                     }
                 }
 
@@ -50,7 +51,7 @@ client.on('message', message => {
                         message.channel.send("Your number is " + number2[i]);
                         return;
                     } else {
-                        message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                        message.channel.send("Number should be " + numberLength[i] + " digits long, and have no zeroes or repetition");
                     }
                 }
             }
@@ -107,12 +108,28 @@ client.on('message', message => {
                     player1[chIdx] = message.author;
                     player2[chIdx] = getUserFromMention(args[0]);
 
+                    numberLength[chIdx] = 3;
+
                     if(player1[chIdx] == player2[chIdx]) {
                         message.channel.send("You can't play with yourself!");
                         gameState[chIdx] = GameState[0];
                     } else {
                         gameState[chIdx] = GameState[1];
                         message.channel.send(args[0] + " please type !ready to start game");
+                    }
+                }else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                    player1[chIdx] = message.author;
+                    player2[chIdx] = getUserFromMention(args[0]);
+
+                    numberLength[chIdx] = args[1];
+
+                    if(player1[chIdx] == player2[chIdx]) {
+                        message.channel.send("You can't play with yourself!");
+                        gameState[chIdx] = GameState[0];
+                    } else {
+                        gameState[chIdx] = GameState[1];
+                        message.channel.send(args[0] + " please type !ready to start game");
+                    
                     }
                 }
                 break;
@@ -124,8 +141,8 @@ client.on('message', message => {
                     games++;
                     console.log(games);
                     message.channel.send("Please DM your numbers to me <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">");
-                    player1[chIdx].send("Send a 3 digit number.");
-                    player2[chIdx].send("Send a 3 digit number.");
+                    player1[chIdx].send("Send a " + numberLength[chIdx] + "  digit number.");
+                    player2[chIdx].send("Send a " + numberLength[chIdx] + "  digit number.");
                     interval[chIdx] = setInterval(function() { checkForNumbers(chIdx); }, 3000);
                 }
                 break;
@@ -155,7 +172,7 @@ client.on('message', message => {
                                 else gameChannel[chIdx].send("Its <@" + player2[chIdx].id + "> 's turn");
                             }
                         } else {
-                            message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                            message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
                         }
                     }
                 } else if(gameState[chIdx] == GameState[4] && message.channel == gameChannel[chIdx] && args.length == 1) {
@@ -169,7 +186,7 @@ client.on('message', message => {
                                 gameChannel[chIdx].send("<@" + player1[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                             }
                         } else {
-                            message.channel.send("Number should be 3 digits long, and have no zeroes or repetition");
+                            message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
                         }
                     }
                 }
@@ -211,9 +228,9 @@ function checkForNumbers(chIdx) {
     }
 }
 
-function verifyMessage(message) {
+function verifyMessage(message, chIdx) {
     var b = true;
-    if(message.length != 3) b = false;
+    if(message.length != numberLength[chIdx]) b = false;
     if(!(/^[1-9]\d*$/.test(message))) b = false;
     if(b) {
         for(var i = 0; i < message.length; i++) {
@@ -259,6 +276,7 @@ function add() {
     number1set.push(false);
     number2set.push(false);
     gameState.push(GameState[0]);
+    numberLength.push(3);
 }
 
 client.login(process.env.BOT_TOKEN);
