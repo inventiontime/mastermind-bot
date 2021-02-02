@@ -34,7 +34,7 @@ client.on('message', message => {
         for(var i = 0; i < gameChannel.length; i++) {
             if(gameState[i] == GameState[2]) {
                 if(message.author == player1[i]) {
-                    if(verifyMessage(message.content) && !number1set[i]) {
+                    if(verifyMessage(message.content, numberLength[i]) && !number1set[i]) {
                         number1[i] = message.content;
                         number1set[i] = true;
                         message.channel.send("Your number is " + number1[i]);
@@ -45,7 +45,7 @@ client.on('message', message => {
                 }
 
                 if(message.author == player2[i]) {
-                    if(verifyMessage(message.content) && !number2set[i]) {
+                    if(verifyMessage(message.content, numberLength[i]) && !number2set[i]) {
                         number2[i] = message.content;
                         number2set[i] = true;
                         message.channel.send("Your number is " + number2[i]);
@@ -151,7 +151,7 @@ client.on('message', message => {
             case "g":
                 if(gameState[chIdx] == GameState[3] && message.channel == gameChannel[chIdx] && args.length == 1) {
                     if((player1turn[chIdx] && message.author == player1[chIdx]) || (!player1turn[chIdx] && message.author == player2[chIdx])) {
-                        if(verifyMessage(args[0])){
+                        if(verifyMessage(args[0], numberLength[chIdx])){
                             if((player1turn[chIdx] && args[0] == number2[chIdx]) || (!player1turn[chIdx] && args[0] == number1[chIdx])) {
                                 if(player1turn[chIdx]) {
                                     gameState[chIdx] = GameState[4];
@@ -177,7 +177,7 @@ client.on('message', message => {
                     }
                 } else if(gameState[chIdx] == GameState[4] && message.channel == gameChannel[chIdx] && args.length == 1) {
                     if(message.author == player2[chIdx]) {
-                        if(verifyMessage(args[0])){
+                        if(verifyMessage(args[0], numberLength[chIdx])){
                             if(args[0] == number1[chIdx]) {
                                 reset(chIdx);
                                 gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
@@ -228,9 +228,9 @@ function checkForNumbers(chIdx) {
     }
 }
 
-function verifyMessage(message, chIdx) {
+function verifyMessage(message, numLen) {
     var b = true;
-    if(message.length != numberLength[chIdx]) b = false;
+    if(message.length != numLen) b = false;
     if(!(/^[1-9]\d*$/.test(message))) b = false;
     if(b) {
         for(var i = 0; i < message.length; i++) {
