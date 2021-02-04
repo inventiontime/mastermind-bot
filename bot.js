@@ -141,8 +141,8 @@ client.on('message', message => {
                     games++;
                     console.log(games);
                     message.channel.send("Please DM your numbers to me <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">");
-                    player1[chIdx].send("Send a " + numberLength[chIdx] + "  digit number.");
-                    player2[chIdx].send("Send a " + numberLength[chIdx] + "  digit number.");
+                    player1[chIdx].send("Send a " + numberLength[chIdx] + " digit number.");
+                    player2[chIdx].send("Send a " + numberLength[chIdx] + " digit number.");
                     interval[chIdx] = setInterval(function() { checkForNumbers(chIdx); }, 3000);
                 }
                 break;
@@ -160,7 +160,7 @@ client.on('message', message => {
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
                                 } else {
                                     reset(chIdx);
-                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                    gameChannel[chIdx].send("<@" + player2[chIdx].id + "> won vs <@" + player2[chIdx].id + ">! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                                 } 
                             } else {
                                 if(player1turn[chIdx]) message.channel.send(checkGuess(args[0], number2[chIdx]))
