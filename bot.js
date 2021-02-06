@@ -93,7 +93,11 @@ client.on('message', message => {
                 
                 "If you get 0 cows and 0 bulls, the response is **shit**\n\n" +
                 
-                "**To start playing, type !play @user**\n\n" +
+                "**To start playing, type \"!play @user\"**\n\n" +
+
+                "You can also use \"!play @user [number of digits]\" eg. !play user 4\n" +
+
+                "For any command, use the first letter as short, eg. *!p* instead of *!play*\n\n" +
                 
                 "This bot is made by @inventiontime");
                 
