@@ -267,6 +267,10 @@ function reset(chIdx) {
     number1set[chIdx] = false;
     number2set[chIdx] = false;
     gameState[chIdx] = GameState[0];
+    if(interval[chIdx] != null) {
+        clearInterval(interval[chIdx]);
+        interval[chIdx] = null;
+    }
 }
 
 function add() {
