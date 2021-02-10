@@ -22,7 +22,7 @@ client.once('ready', () => {
     
     client.user.setPresence({
         status: "online",
-        game: {
+        activity: {
             name: "!help",
             type: "LISTENING",
         }
@@ -95,9 +95,9 @@ client.on('message', message => {
                 
                 "**To start playing, type \"!play @user\"**\n\n" +
 
-                "You can also use \"!play @user [number of digits]\" eg. !play user 4\n" +
+                "You can also use **!play @user [number of digits]** eg. **!play user 4**\n" +
 
-                "For any command, use the first letter as short, eg. *!p* instead of *!play*\n\n" +
+                "For any command, use the first letter as short, eg. **!p** instead of **!play**\n\n" +
                 
                 "This bot is made by @inventiontime");
                 
@@ -122,18 +122,19 @@ client.on('message', message => {
                         message.channel.send(args[0] + " please type !ready to start game");
                     }
                 }else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
-                    player1[chIdx] = message.author;
-                    player2[chIdx] = getUserFromMention(args[0]);
+                    if(args[1] > 0 && args[1] < 10) {
+                        player1[chIdx] = message.author;
+                        player2[chIdx] = getUserFromMention(args[0]);
 
-                    numberLength[chIdx] = args[1];
+                        numberLength[chIdx] = args[1];
 
-                    if(player1[chIdx] == player2[chIdx]) {
-                        message.channel.send("You can't play with yourself!");
-                        gameState[chIdx] = GameState[0];
-                    } else {
-                        gameState[chIdx] = GameState[1];
-                        message.channel.send(args[0] + " please type !ready to start game");
-                    
+                        if(player1[chIdx] == player2[chIdx]) {
+                            message.channel.send("You can't play with yourself!");
+                            gameState[chIdx] = GameState[0];
+                        } else {
+                            gameState[chIdx] = GameState[1];
+                            message.channel.send(args[0] + " please type !ready to start game");
+                        }
                     }
                 }
                 break;
