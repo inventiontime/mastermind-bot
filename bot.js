@@ -117,12 +117,14 @@ client.on('message', message => {
                             numberLength[chIdx] = 3;
                             gameState[chIdx] = GameState[5];
                             number2[chIdx] = randomNumber(numberLength[chIdx]);
+                            message.channel.send("You can start guessing using !guess [number]");
                         } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             if(args[1] > 0 && args[1] < 10) {
                                 player1[chIdx] = message.author;
                                 numberLength[chIdx] = args[1];
                                 gameState[chIdx] = GameState[5];
                                 number2[chIdx] = randomNumber(numberLength[chIdx]);
+                                message.channel.send("You can start guessing using !guess [number]");
                             }
                         }
                     } else {
