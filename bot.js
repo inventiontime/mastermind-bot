@@ -6,6 +6,7 @@ var player1 = [];
 var player2 = [];
 var number1 = [];
 var number2 = [];
+var turnNumber = [];
 var player1turn = [];
 var interval = [];
 var number1set = [];
@@ -96,6 +97,7 @@ client.on('message', message => {
                 "**To start playing, type \"!play @user\"**\n\n" +
 
                 "You can also use **!play @user [number of digits]** eg. **!play user 4**\n" +
+                "To practice, you can play solo using **!play [number of digits]**\n" +
 
                 "For any command, use the first letter as short, eg. **!p** instead of **!play**\n\n" +
                 
@@ -113,16 +115,14 @@ client.on('message', message => {
                         if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             player1[chIdx] = message.author;
                             numberLength[chIdx] = 3;
-
+                            gameState[chIdx] = GameState[5];
                             number2[chIdx] = randomNumber(numberLength[chIdx]);
-                            message.channel.send("Your number is " + number2[chIdx]);
                         } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             if(args[1] > 0 && args[1] < 10) {
                                 player1[chIdx] = message.author;
                                 numberLength[chIdx] = args[1];
-
+                                gameState[chIdx] = GameState[5];
                                 number2[chIdx] = randomNumber(numberLength[chIdx]);
-                                message.channel.send("Your number is " + number2[chIdx]);
                             }
                         }
                     } else {
@@ -179,17 +179,22 @@ client.on('message', message => {
                         if(verifyMessage(args[0], numberLength[chIdx])) {
                             if((player1turn[chIdx] && args[0] == number2[chIdx]) || (!player1turn[chIdx] && args[0] == number1[chIdx])) {
                                 if(player1turn[chIdx]) {
+                                    turnNumber[chIdx]++;
                                     gameState[chIdx] = GameState[4];
                                     player1turn[chIdx] = !player1turn[chIdx];
-                                    gameChannel[chIdx].send("Correct number!!!")
+                                    gameChannel[chIdx].send("Correct number!!!");
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
                                 } else {
                                     reset(chIdx);
-                                    gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                    gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                                 } 
                             } else {
-                                if(player1turn[chIdx]) message.channel.send(checkGuess(args[0], number2[chIdx]))
-                                else message.channel.send(checkGuess(args[0], number1[chIdx]))
+                                if(player1turn[chIdx]) { 
+                                    message.channel.send(checkGuess(args[0], number2[chIdx]));
+                                    turnNumber[chIdx]++;
+                                } else {
+                                    message.channel.send(checkGuess(args[0], number1[chIdx]));
+                                }
 
                                 player1turn[chIdx] = !player1turn[chIdx];
 
@@ -205,10 +210,10 @@ client.on('message', message => {
                         if(verifyMessage(args[0], numberLength[chIdx])){
                             if(args[0] == number1[chIdx]) {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + ">! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + "> in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                             } else {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player1[chIdx].id + "> won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player1[chIdx].id + "> won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                             }
                         } else {
                             message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
@@ -217,9 +222,10 @@ client.on('message', message => {
                 } else if(gameState[chIdx] == GameState[5] && args.length == 1) {
                     if(player1turn[chIdx]) {
                         if(verifyMessage(args[0], numberLength[chIdx])) {
+                            turnNumber[chIdx]++;
                             if(args[0] == number2[chIdx]) {
                                 reset(chIdx);
-                                gameChannel[chIdx].send("You won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                gameChannel[chIdx].send("You won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                             } else {
                                 message.channel.send(checkGuess(args[0], number2[chIdx]));
                             }
@@ -255,7 +261,7 @@ function getUserFromMention(mention) {
 	}
 }
 
-f=(x,y="")=>x?!y.match(z=Math.random()*9|0)&&y|z?f(x-1,y+z):f(x,y):y;
+f=(x,y="")=>x?!y.match(z=(Math.random()*9+1)|0)&&y|z?f(x-1,y+z):f(x,y):y;
 
 function randomNumber(numLen) {
     return f(numLen);
@@ -310,6 +316,7 @@ function checkGuess(guess, number) {
 function reset(chIdx) {
     number1set[chIdx] = false;
     number2set[chIdx] = false;
+    turnNumber[chIdx] = 0;
     gameState[chIdx] = GameState[0];
     if(interval[chIdx] != null) {
         clearInterval(interval[chIdx]);
@@ -323,6 +330,7 @@ function add() {
     player1turn.push(true);
     number1set.push(false);
     number2set.push(false);
+    turnNumber.push(0);
     gameState.push(GameState[0]);
     numberLength.push(3);
 }
