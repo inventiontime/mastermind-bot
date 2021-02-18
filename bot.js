@@ -255,7 +255,7 @@ function getUserFromMention(mention) {
 	}
 }
 
-f=(x,y="")=>x?!y.match(z=Math.random()*9+1)&&y|z?f(x-1,y+z):f(x,y):y;
+f=(x,y="")=>x?!y.match(z=Math.random()*9+1|0)&&y|z?f(x-1,y+z):f(x,y):y;
 
 function randomNumber(numLen) {
     return f(numLen);
