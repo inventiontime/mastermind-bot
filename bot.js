@@ -114,6 +114,7 @@ client.on('message', message => {
                     if(args[0] == "solo" || args[0] == "s") {
                         if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             player1[chIdx] = message.author;
+                            player2[chIdx] = null;
                             numberLength[chIdx] = 3;
                             gameState[chIdx] = GameState[5];
                             number2[chIdx] = randomNumber(numberLength[chIdx]);
@@ -121,6 +122,7 @@ client.on('message', message => {
                         } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             if(args[1] > 0 && args[1] < 10) {
                                 player1[chIdx] = message.author;
+                                player2[chIdx] = null;
                                 numberLength[chIdx] = args[1];
                                 gameState[chIdx] = GameState[5];
                                 number2[chIdx] = randomNumber(numberLength[chIdx]);
