@@ -108,7 +108,7 @@ client.on('message', message => {
         switch(command) {
             case "play":
             case "p":
-                if(args.length > 1) {
+                if(args.length > 0) {
                     if(args[0] == "solo" || args[0] == "s") {
                         if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                             player1[chIdx] = message.author;
@@ -255,9 +255,10 @@ function getUserFromMention(mention) {
 	}
 }
 
+f=(x,y="")=>x?!y.match(z=Math.random()*10|0)&&y|z?f(x-1,y+z):f(x,y):y;
+
 function randomNumber(numLen) {
-    var x = numLen;
-    return f = (x, y="") => x?!y.match(z=Math.random()*10)?f(x-1,y+z):f(x,y):y;
+    return f(numLen);
 }
 
 function checkForNumbers(chIdx) {
