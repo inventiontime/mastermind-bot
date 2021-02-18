@@ -13,7 +13,7 @@ var number2set = [];
 var gameChannel = [];
 var gameState = [];
 var numberLength = [];
-const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining"];
+const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining", "solo"];
 
 var games = 0;
 
@@ -108,32 +108,52 @@ client.on('message', message => {
         switch(command) {
             case "play":
             case "p":
-                if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
-                    player1[chIdx] = message.author;
-                    player2[chIdx] = getUserFromMention(args[0]);
+                if(args.length > 1) {
+                    if(args[0] == "solo" || args[0] == "s") {
+                        if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                            player1[chIdx] = message.author;
+                            numberLength[chIdx] = 3;
 
-                    numberLength[chIdx] = 3;
+                            number2[chIdx] = randomNumber(numberLength[chIdx]);
+                            message.channel.send("Your number is " + number2[chIdx]);
+                        } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                            if(args[1] > 0 && args[1] < 10) {
+                                player1[chIdx] = message.author;
+                                numberLength[chIdx] = args[1];
 
-                    if(player1[chIdx] == player2[chIdx]) {
-                        message.channel.send("You can't play with yourself!");
-                        gameState[chIdx] = GameState[0];
+                                number2[chIdx] = randomNumber(numberLength[chIdx]);
+                                message.channel.send("Your number is " + number2[chIdx]);
+                            }
+                        }
                     } else {
-                        gameState[chIdx] = GameState[1];
-                        message.channel.send(args[0] + " please type !ready to start game");
-                    }
-                }else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
-                    if(args[1] > 0 && args[1] < 10) {
-                        player1[chIdx] = message.author;
-                        player2[chIdx] = getUserFromMention(args[0]);
+                        if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                            player1[chIdx] = message.author;
+                            player2[chIdx] = getUserFromMention(args[0]);
 
-                        numberLength[chIdx] = args[1];
+                            numberLength[chIdx] = 3;
 
-                        if(player1[chIdx] == player2[chIdx]) {
-                            message.channel.send("You can't play with yourself!");
-                            gameState[chIdx] = GameState[0];
-                        } else {
-                            gameState[chIdx] = GameState[1];
-                            message.channel.send(args[0] + " please type !ready to start game");
+                            if(player1[chIdx] == player2[chIdx]) {
+                                message.channel.send("You can't play with yourself!");
+                                gameState[chIdx] = GameState[0];
+                            } else {
+                                gameState[chIdx] = GameState[1];
+                                message.channel.send(args[0] + " please type !ready to start game");
+                            }
+                        } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                            if(args[1] > 0 && args[1] < 10) {
+                                player1[chIdx] = message.author;
+                                player2[chIdx] = getUserFromMention(args[0]);
+
+                                numberLength[chIdx] = args[1];
+
+                                if(player1[chIdx] == player2[chIdx]) {
+                                    message.channel.send("You can't play with yourself!");
+                                    gameState[chIdx] = GameState[0];
+                                } else {
+                                    gameState[chIdx] = GameState[1];
+                                    message.channel.send(args[0] + " please type !ready to start game");
+                                }
+                            }
                         }
                     }
                 }
@@ -141,7 +161,7 @@ client.on('message', message => {
 
             case "ready":
             case "r":
-                if(gameState[chIdx] == GameState[1] && player2[chIdx] == message.author && message.channel == gameChannel[chIdx]) {
+                if(gameState[chIdx] == GameState[1] && player2[chIdx] == message.author) {
                     gameState[chIdx] = GameState[2];
                     games++;
                     console.log(games);
@@ -154,9 +174,9 @@ client.on('message', message => {
 
             case "guess":
             case "g":
-                if(gameState[chIdx] == GameState[3] && message.channel == gameChannel[chIdx] && args.length == 1) {
+                if(gameState[chIdx] == GameState[3] && args.length == 1) {
                     if((player1turn[chIdx] && message.author == player1[chIdx]) || (!player1turn[chIdx] && message.author == player2[chIdx])) {
-                        if(verifyMessage(args[0], numberLength[chIdx])){
+                        if(verifyMessage(args[0], numberLength[chIdx])) {
                             if((player1turn[chIdx] && args[0] == number2[chIdx]) || (!player1turn[chIdx] && args[0] == number1[chIdx])) {
                                 if(player1turn[chIdx]) {
                                     gameState[chIdx] = GameState[4];
@@ -180,7 +200,7 @@ client.on('message', message => {
                             message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
                         }
                     }
-                } else if(gameState[chIdx] == GameState[4] && message.channel == gameChannel[chIdx] && args.length == 1) {
+                } else if(gameState[chIdx] == GameState[4] && args.length == 1) {
                     if(message.author == player2[chIdx]) {
                         if(verifyMessage(args[0], numberLength[chIdx])){
                             if(args[0] == number1[chIdx]) {
@@ -194,12 +214,25 @@ client.on('message', message => {
                             message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
                         }
                     }
+                } else if(gameState[chIdx] == GameState[5] && args.length == 1) {
+                    if(player1turn[chIdx]) {
+                        if(verifyMessage(args[0], numberLength[chIdx])) {
+                            if(args[0] == number2[chIdx]) {
+                                reset(chIdx);
+                                gameChannel[chIdx].send("You won! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                            } else {
+                                message.channel.send(checkGuess(args[0], number2[chIdx]));
+                            }
+                        } else {
+                            message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
+                        }
+                    }
                 }
                 break;
 
             case "exit":
             case "e":
-                if((message.author == player1[chIdx] || message.author == player2[chIdx]) && gameState[chIdx] != GameState[0] && gameState[chIdx] != GameState[1] && message.channel == gameChannel[chIdx]) {
+                if((message.author == player1[chIdx] || message.author == player2[chIdx]) && gameState[chIdx] != GameState[0]) {
                     reset(chIdx);
                     gameChannel[chIdx].send("Match has ended");
                 }
@@ -220,6 +253,11 @@ function getUserFromMention(mention) {
 
 		return client.users.cache.get(mention);
 	}
+}
+
+function randomNumber(numLen) {
+    var x = numLen;
+    return f = (x, y="") => x?!y.match(z=Math.random()*10)?f(x-1,y+z):f(x,y):y;
 }
 
 function checkForNumbers(chIdx) {
