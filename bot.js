@@ -97,7 +97,7 @@ client.on('message', message => {
                 "**To start playing, type \"!play @user\"**\n\n" +
 
                 "You can also use **!play @user [number of digits]** eg. **!play user 4**\n" +
-                "To practice, you can play solo using **!play [number of digits]**\n" +
+                "To practice, you can play solo using **!play solo [number of digits]**\n" +
 
                 "For any command, use the first letter as short, eg. **!p** instead of **!play**\n\n" +
                 
@@ -185,8 +185,8 @@ client.on('message', message => {
                                     gameChannel[chIdx].send("Correct number!!!");
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
                                 } else {
-                                    reset(chIdx);
                                     gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                    reset(chIdx);
                                 } 
                             } else {
                                 if(player1turn[chIdx]) { 
@@ -209,11 +209,11 @@ client.on('message', message => {
                     if(message.author == player2[chIdx]) {
                         if(verifyMessage(args[0], numberLength[chIdx])){
                             if(args[0] == number1[chIdx]) {
-                                reset(chIdx);
                                 gameChannel[chIdx].send("Its a tie between <@" + player1[chIdx].id + "> and <@" + player2[chIdx].id + "> in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
-                            } else {
                                 reset(chIdx);
+                            } else {
                                 gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player1[chIdx].id + "> won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                reset(chIdx);
                             }
                         } else {
                             message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
@@ -224,8 +224,8 @@ client.on('message', message => {
                         if(verifyMessage(args[0], numberLength[chIdx])) {
                             turnNumber[chIdx]++;
                             if(args[0] == number2[chIdx]) {
-                                reset(chIdx);
                                 gameChannel[chIdx].send("You won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+                                reset(chIdx);
                             } else {
                                 message.channel.send(checkGuess(args[0], number2[chIdx]));
                             }
