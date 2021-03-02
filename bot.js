@@ -14,6 +14,10 @@ var number2set = [];
 var gameChannel = [];
 var gameState = [];
 var numberLength = [];
+var isBlitz = [];
+var blitzTime = [];
+var blitzTimeRemaining = [];
+var blitzInterval = [];
 const GameState = ["no game", "waiting for player 2", "waiting for numbers", "guessing", "player 2 guess remaining", "solo"];
 
 var games = 0;
@@ -70,8 +74,7 @@ client.on('message', message => {
     var chIdx = gameChannel.indexOf(message.channel);
 
     if(chIdx == -1) {
-        gameChannel.push(message.channel);
-        add();
+        add(message.channel);
         chIdx = gameChannel.indexOf(message.channel);
         //message.channel.send("This channel has been added");
     }
@@ -110,16 +113,16 @@ client.on('message', message => {
         switch(command) {
             case "play":
             case "p":
-                if(args.length > 0) {
+                if(args.length > 0 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
                     if(args[0] == "solo" || args[0] == "s") {
-                        if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                        if(args.length == 1) {
                             player1[chIdx] = message.author;
                             player2[chIdx] = null;
                             numberLength[chIdx] = 3;
                             gameState[chIdx] = GameState[5];
                             number2[chIdx] = randomNumber(numberLength[chIdx]);
                             message.channel.send("You can start guessing using !guess [number]");
-                        } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                        } else if(args.length == 2) {
                             if(args[1] > 0 && args[1] < 10) {
                                 player1[chIdx] = message.author;
                                 player2[chIdx] = null;
@@ -130,11 +133,12 @@ client.on('message', message => {
                             }
                         }
                     } else {
-                        if(args.length == 1 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                        if(args.length == 1) {
                             player1[chIdx] = message.author;
                             player2[chIdx] = getUserFromMention(args[0]);
 
                             numberLength[chIdx] = 3;
+                            isBlitz[chIdx] = false;
 
                             if(player1[chIdx] == player2[chIdx]) {
                                 message.channel.send("You can't play with yourself!");
@@ -143,12 +147,30 @@ client.on('message', message => {
                                 gameState[chIdx] = GameState[1];
                                 message.channel.send(args[0] + " please type !ready to start game");
                             }
-                        } else if(args.length == 2 && (gameState[chIdx] == GameState[0] || gameState[chIdx] == GameState[1])) {
+                        } else if(args.length == 2) {
                             if(args[1] > 0 && args[1] < 10) {
                                 player1[chIdx] = message.author;
                                 player2[chIdx] = getUserFromMention(args[0]);
 
                                 numberLength[chIdx] = args[1];
+                                isBlitz[chIdx] = false;
+
+                                if(player1[chIdx] == player2[chIdx]) {
+                                    message.channel.send("You can't play with yourself!");
+                                    gameState[chIdx] = GameState[0];
+                                } else {
+                                    gameState[chIdx] = GameState[1];
+                                    message.channel.send(args[0] + " please type !ready to start game");
+                                }
+                            }
+                        } else if(args.length == 3) {
+                            if(args[1] > 0 && args[1] < 10 && args[2] > 0) {
+                                player1[chIdx] = message.author;
+                                player2[chIdx] = getUserFromMention(args[0]);
+
+                                numberLength[chIdx] = args[1];
+                                isBlitz[chIdx] = true;
+                                blitzTime[chIdx] = args[2];
 
                                 if(player1[chIdx] == player2[chIdx]) {
                                     message.channel.send("You can't play with yourself!");
@@ -188,10 +210,11 @@ client.on('message', message => {
                                     player1turn[chIdx] = !player1turn[chIdx];
                                     gameChannel[chIdx].send("Correct number!!!");
                                     gameChannel[chIdx].send("<@" + player2[chIdx].id + "> , you have a chance to tie! Its your turn.");
+                                    if(isBlitz[chIdx]) startBlitzTimer(chIdx);
                                 } else {
                                     gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won in " + turnNumber[chIdx] + " moves! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
                                     reset(chIdx);
-                                } 
+                                }
                             } else {
                                 if(player1turn[chIdx]) { 
                                     message.channel.send(checkGuess(args[0], number2[chIdx]));
@@ -204,6 +227,8 @@ client.on('message', message => {
 
                                 if(player1turn[chIdx]) gameChannel[chIdx].send("Its <@" + player1[chIdx].id + "> 's turn");
                                 else gameChannel[chIdx].send("Its <@" + player2[chIdx].id + "> 's turn");
+
+                                if(isBlitz[chIdx]) startBlitzTimer(chIdx);
                             }
                         } else {
                             message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
@@ -272,12 +297,35 @@ function randomNumber(numLen) {
 function checkForNumbers(chIdx) {
     if(number1set[chIdx] && number2set[chIdx]) {
         gameState[chIdx] = GameState[3];
+        if(isBlitz[chIdx]) startBlitzTimer(chIdx);
         gameChannel[chIdx].send("You can start guessing using !guess [number]");
         gameChannel[chIdx].send("Its <@" + player1[chIdx].id + "> 's turn");
         player1turn[chIdx] = true;
         clearInterval(interval[chIdx]);
         interval[chIdx] = null;
     }
+}
+
+function startBlitzTimer(chIdx) {
+    if(blitzInterval[chIdx] != null) {
+        clearInterval(blitzInterval[chIdx]);
+        blitzInterval[chIdx] = null;
+    }
+    blitzTimeRemaining[chIdx] = blitzTime[chIdx];
+    message = channel[chIdx].send("Time left: " + blitzTime[chIdx] + " seconds");
+    blitzInterval[chIdx] = setInterval(function() { blitzIntervalFunction(message, chIdx) }, 1000);
+}
+
+function blitzIntervalFunction(message, chIdx) {
+    if(gameState[chIdx] == GameState[3] || gameState[chIdx] == GameState[4]) {
+        blitzTimeRemaining[chIdx]--;
+        message.edit("Time left: " + blitzTimeRemaining[chIdx] + " seconds");
+        if(blitzTimeRemaining[chIdx] <= 0) {
+            if(player1turn[chIdx]) gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won by no response from opponent! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+            else gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player1[chIdx].id + "> won by no response from opponent! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
+            reset(chIdx);
+        }
+    } else clearInterval(blitzInterval[chIdx]);
 }
 
 function verifyMessage(message, numLen) {
@@ -326,15 +374,22 @@ function reset(chIdx) {
     }
 }
 
-function add() {
+function add(channel) {
     number1.push(0);
     number2.push(0);
+    player1.push(null);
+    player2.push(null);
     player1turn.push(true);
+    interval.push(null);
     number1set.push(false);
     number2set.push(false);
     turnNumber.push(0);
+    gameChannel.push(channel);
     gameState.push(GameState[0]);
     numberLength.push(3);
+    isBlitz.push(false);
+    blitzInterval.push(null);
+    blitzTime.push(0);
 }
 
 client.login(process.env.BOT_TOKEN);
