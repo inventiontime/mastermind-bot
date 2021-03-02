@@ -312,7 +312,7 @@ function startBlitzTimer(chIdx) {
         blitzInterval[chIdx] = null;
     }
     blitzTimeRemaining[chIdx] = blitzTime[chIdx];
-    message = channel[chIdx].send("Time left: " + blitzTime[chIdx] + " seconds");
+    message = gameChannel[chIdx].send("Time left: " + blitzTime[chIdx] + " seconds");
     blitzInterval[chIdx] = setInterval(function() { blitzIntervalFunction(message, chIdx) }, 1000);
 }
 
