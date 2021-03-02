@@ -306,7 +306,7 @@ function checkForNumbers(chIdx) {
     }
 }
 
-function startBlitzTimer(chIdx) {
+async function startBlitzTimer(chIdx) {
     if(blitzInterval[chIdx] != null) {
         clearInterval(blitzInterval[chIdx]);
         blitzInterval[chIdx] = null;
