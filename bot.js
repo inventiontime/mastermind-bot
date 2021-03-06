@@ -99,7 +99,9 @@ client.on('message', message => {
                 
                 "**To start playing, type \"!play @user\"**\n\n" +
 
-                "You can also use **!play @user [number of digits]** eg. **!play user 4**\n" +
+                "> **OTHER GAMEMODES**\n" +
+                "For more digits, use **!play @user [number of digits]** eg. **!play @user 4**\n" +
+                "For a quick paced game, play with a timer using **!play @user [number of digit] [time per move (in sec)]** eg. **!play @user 3 15**\n" +
                 "To practice, you can play solo using **!play solo [number of digits]**\n" +
 
                 "For any command, use the first letter as short, eg. **!p** instead of **!play**\n\n" +
