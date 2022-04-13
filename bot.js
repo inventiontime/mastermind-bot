@@ -329,7 +329,7 @@ async function startBlitzTimer(chIdx) {
 }
 
 function blitzIntervalFunction(message, chIdx) {
-    if(gameState[chIdx] == GameState[3] || gameState[chIdx] == GameState[4]) {
+    if((gameState[chIdx] == GameState[3] || gameState[chIdx] == GameState[4]) && isBlitz[chIdx]) {
         blitzTimeRemaining[chIdx]--;
         message.edit("Time left: " + blitzTimeRemaining[chIdx] + " seconds");
         if(blitzTimeRemaining[chIdx] <= 0) {
