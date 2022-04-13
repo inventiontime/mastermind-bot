@@ -157,7 +157,7 @@ client.on('message', message => {
                                 gameState[chIdx] = GameState[0];
                             } else {
                                 gameState[chIdx] = GameState[1];
-                                message.channel.send(args[0] + " please type !ready to start game");
+                                message.channel.send(args[0] + " please type !ready to start game (" + gameInfo(chIdx) + ")");
                             }
                         } else if(args.length == 2) {
                             if(args[1] > 0 && args[1] < 10) {
@@ -172,7 +172,7 @@ client.on('message', message => {
                                     gameState[chIdx] = GameState[0];
                                 } else {
                                     gameState[chIdx] = GameState[1];
-                                    message.channel.send(args[0] + " please type !ready to start game");
+                                    message.channel.send(args[0] + " please type !ready to start game (" + gameInfo(chIdx) + ")");
                                 }
                             }
                         } else if(args.length == 3) {
@@ -189,7 +189,7 @@ client.on('message', message => {
                                     gameState[chIdx] = GameState[0];
                                 } else {
                                     gameState[chIdx] = GameState[1];
-                                    message.channel.send(args[0] + " please type !ready to start game");
+                                    message.channel.send(args[0] + " please type !ready to start game (" + gameInfo(chIdx) + ")");
                                 }
                             }
                         }
@@ -243,7 +243,7 @@ client.on('message', message => {
                                 if(isBlitz[chIdx]) startBlitzTimer(chIdx);
                             }
                         } else {
-                            message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
+                            message.channel.send("Number should be " + numberLength[chIdx] + " digits long, and have no zeroes or repetition");
                         }
                     }
                 } else if(gameState[chIdx] == GameState[4] && args.length == 1) {
@@ -257,7 +257,7 @@ client.on('message', message => {
                                 reset(chIdx);
                             }
                         } else {
-                            message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
+                            message.channel.send("Number should be " + numberLength[chIdx] + " digits long, and have no zeroes or repetition");
                         }
                     }
                 } else if(gameState[chIdx] == GameState[5] && args.length == 1) {
@@ -270,7 +270,7 @@ client.on('message', message => {
                             message.channel.send(checkGuess(args[0], number2[chIdx]));
                         }
                     } else {
-                        message.channel.send("Number should be " + numberLength[chIdx] + "  digits long, and have no zeroes or repetition");
+                        message.channel.send("Number should be " + numberLength[chIdx] + " digits long, and have no zeroes or repetition");
                     }
                 }
                 break;
@@ -419,6 +419,15 @@ function add(channel) {
     isBlitz.push(false);
     blitzInterval.push(null);
     blitzTime.push(0);
+}
+
+function gameInfo(chIdx) {
+    var info = 
+        numberLength[chIdx] +
+        " digits";
+    if(isBlitz[chIdx])
+        info += ", " + blitzTime[chIdx] + " second blitz"; 
+    return info;
 }
 
 client.login(process.env.BOT_TOKEN);
