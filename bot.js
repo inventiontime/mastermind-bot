@@ -44,8 +44,13 @@ client.on('message', message => {
                         number1set[i] = true;
                         message.channel.send("Your number is " + number1[i]);
                         return;
+                    } else if(message.content == "rand") {
+                        number1[i] = randomNumber(numberLength[i]);
+                        number1set[i] = true;
+                        message.channel.send("Your number is " + number1[i]);
+                        return;
                     } else {
-                        message.channel.send("Number should be " + numberLength[i] + " digits long, and have no zeroes or repetition");
+                        message.channel.send("Should be `rand` or a number " + numberLength[i] + " digits long, having no zeroes or repetition");
                     }
                 }
 
@@ -55,8 +60,13 @@ client.on('message', message => {
                         number2set[i] = true;
                         message.channel.send("Your number is " + number2[i]);
                         return;
+                    } else if(message.content == "rand") {
+                        number2[i] = randomNumber(numberLength[i]);
+                        number2set[i] = true;
+                        message.channel.send("Your number is " + number2[i]);
+                        return;
                     } else {
-                        message.channel.send("Number should be " + numberLength[i] + " digits long, and have no zeroes or repetition");
+                        message.channel.send("Should be `rand` or a number " + numberLength[i] + " digits long, having no zeroes or repetition");
                     }
                 }
             }
