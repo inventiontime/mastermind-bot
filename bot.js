@@ -323,9 +323,21 @@ function blitzIntervalFunction(message, chIdx) {
         blitzTimeRemaining[chIdx]--;
         message.edit("Time left: " + blitzTimeRemaining[chIdx] + " seconds");
         if(blitzTimeRemaining[chIdx] <= 0) {
-            if(player1turn[chIdx]) gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player2[chIdx].id + "> won by no response from opponent! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
-            else gameChannel[chIdx].send("<@" + player1[chIdx].id + "> vs <@" + player2[chIdx].id + ">, <@" + player1[chIdx].id + "> won by no response from opponent! :partying_face: ID: " + Math.floor(Math.random() * 100000).toString());
-            reset(chIdx);
+            gameChannel[chIdx].send("Time's up, turn skipped");
+            
+            // lines copied with slight variation from section of code responding to "guess" command
+            if(player1turn[chIdx]) { 
+                turnNumber[chIdx]++;
+            } else {
+
+            }
+
+            player1turn[chIdx] = !player1turn[chIdx];
+
+            if(player1turn[chIdx]) gameChannel[chIdx].send("Its <@" + player1[chIdx].id + "> 's turn");
+            else gameChannel[chIdx].send("Its <@" + player2[chIdx].id + "> 's turn");
+
+            if(isBlitz[chIdx]) startBlitzTimer(chIdx);
         }
     } else clearInterval(blitzInterval[chIdx]);
 }
